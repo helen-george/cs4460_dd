@@ -1,0 +1,63 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#map {
+    width: 800px;
+    height: 500px;
+    margin-top: 20px;
+    position: relative;
+}
+
+#legend {
+    width: 100px;
+    text-align: center;
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+#legend h2 {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.tooltip {
+    position: absolute;
+    padding: 8px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    border-radius: 4px;
+    font-size: 12px;
+    pointer-events: none;
+    display: none;
+    z-index: 10;
+    max-width: 200px;
+}
+
+.tooltip::after {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent rgba(0, 0, 0, 0.8) transparent;
+}
+
+#map svg {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
