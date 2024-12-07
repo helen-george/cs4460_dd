@@ -141,7 +141,7 @@ d3.csv('hurricane_data_2000.csv', dataPreprocessor).then(function(dataset) {
         var mapBrush = d3.brush()
             .extent([[0, 0], [svgWidth2, svgHeight2]])
             .on("start", () => {
-                mapSvg.selectAll(".brush").remove()
+                d3.select('#scatterPlot').call(d3.brush().move, null);
             })
             .on("end", brushMove);
 
@@ -238,8 +238,8 @@ d3.csv('hurricane_data_2000.csv', dataPreprocessor).then(function(dataset) {
             chartG.selectAll('.dot')
             .attr('fill', '#3498db');
         })
-        chartG.selectAll(".brush").call(d3.brush().clear);
-        mapSvg.selectAll(".brush").call(d3.brush().clear);
+        chartG.selectAll(".brush").remove();//call(d3.brush().clear);
+        mapSvg.selectAll(".brush").remove();//call(d3.brush().clear);
 
         mapSvg.selectAll(".brush").call(d3.brush().move, null).remove();
         chartG.selectAll(".brush").call(d3.brush().move, null).remove();
@@ -271,7 +271,9 @@ d3.csv('hurricane_data_2000.csv', dataPreprocessor).then(function(dataset) {
         const plotBrush = d3.brush()
         .extent([[100, 80], [cellWidth + padding.l, cellHeight + padding.b]])
         .on("start", () => {
-            chartG.selectAll(".brush").remove();
+
+            mapSvg.call(d3.brush().move, null);
+
         })
         .on("brush end", brushMove);
         d3.select("#scatterPlot")
