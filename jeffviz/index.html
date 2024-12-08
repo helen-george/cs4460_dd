@@ -1,210 +1,162 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-  <title>Southeast Region Mitigation Projects</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://d3js.org/topojson.v3.min.js"></script>
+  <title>D3 Geo Map</title>
   <style>
-    .container {
-      max-width: 900px;
-      margin: 20px auto;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-    }
-
-    .title {
-      text-align: center;
-      font-size: 20px;
-      margin-bottom: 20px;
-      color: #333;
-    }
-
-    .bar {
-      transition: opacity 0.2s;
-    }
-
-    .bar:hover {
-      opacity: 0.8;
+    #map {
+      margin: 20px;
     }
 
     .tooltip {
       position: absolute;
-      padding: 10px;
-      background: rgba(255, 255, 255, 0.9);
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.95);
       border: 1px solid #ddd;
       border-radius: 4px;
       pointer-events: none;
+      font-family: Arial, sans-serif;
       font-size: 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      opacity: 0;
     }
 
-    .legend {
-      font-size: 12px;
+    .state {
+      stroke: white;
+      stroke-width: 1px;
     }
 
-    .axis-label {
-      font-size: 12px;
-      fill: #666;
+    .state:hover {
+      opacity: 0.8;
     }
 
   </style>
 </head>
 
 <body>
-  <div class="container">
-    <h2 class="title">Mitigation Project Status in Southeast States</h2>
-    <div id="chart"></div>
-  </div>
-
+  <div id="map"></div>
   <script>
-    // Data
-    const data = [
-      {
-        state: "Florida",
-        approved: 45,
-        pending: 28,
-        notApproved: 15,
-        total: 88
-      },
-      {
-        state: "Georgia",
-        approved: 32,
-        pending: 22,
-        notApproved: 18,
-        total: 72
-      },
-      {
-        state: "Alabama",
-        approved: 28,
-        pending: 20,
-        notApproved: 12,
-        total: 60
-      },
-      {
-        state: "North Carolina",
-        approved: 25,
-        pending: 18,
-        notApproved: 14,
-        total: 57
-      },
-      {
-        state: "Tennessee",
-        approved: 22,
-        pending: 15,
-        notApproved: 10,
-        total: 47
-      }
-    ];
-
     // Set up dimensions
-    const margin = { top: 40, right: 100, bottom: 60, left: 60 };
-    const width = 800 - margin.left - margin.right;
-    const height = 400 - margin.top - margin.bottom;
+    const width = 960;
+    const height = 600;
+    const margin = { top: 20, right: 20, bottom: 20, left: 20 };
 
     // Create SVG
-    const svg = d3.select("#chart")
+    const svg = d3.select("#map")
       .append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
-
-    // Set up scales
-    const x = d3.scaleBand()
-      .domain(data.map(d => d.state))
-      .range([0, width])
-      .padding(0.1);
-
-    const y = d3.scaleLinear()
-      .domain([0, d3.max(data, d => d.total)])
-      .range([height, 0]);
-
-    // Stack the data
-    const keys = ["approved", "pending", "notApproved"];
-    const stack = d3.stack().keys(keys);
-    const stackedData = stack(data);
-
-    // Updated color scale with blue theme
-    const color = d3.scaleOrdinal()
-      .domain(keys)
-      .range(["#2196F3", "#64B5F6", "#BBDEFB"]);
+      .attr("width", width)
+      .attr("height", height);
 
     // Create tooltip
     const tooltip = d3.select("body")
       .append("div")
-      .attr("class", "tooltip")
-      .style("opacity", 0);
+      .attr("class", "tooltip");
 
-    // Add bars
-    svg.selectAll("g")
-      .data(stackedData)
-      .join("g")
-      .attr("fill", d => color(d.key))
-      .selectAll("rect")
-      .data(d => d)
-      .join("rect")
-      .attr("class", "bar")
-      .attr("x", d => x(d.data.state))
-      .attr("y", d => y(d[1]))
-      .attr("height", d => y(d[0]) - y(d[1]))
-      .attr("width", x.bandwidth())
-      .on("mouseover", function (event, d) {
-        const key = d3.select(this.parentNode).datum().key;
-        const value = d.data[key];
-        tooltip.transition()
-          .duration(200)
-          .style("opacity", .9);
-        tooltip.html(`${d.data.state}<br/>${key}: ${value} projects`)
-          .style("left", (event.pageX + 10) + "px")
-          .style("top", (event.pageY - 28) + "px");
-      })
-      .on("mouseout", function (d) {
-        tooltip.transition()
-          .duration(500)
-          .style("opacity", 0);
+    // Create color scale
+    const colorScale = d3.scaleSequential(d3.interpolateBlues);
+
+    // Load data
+    Promise.all([
+      d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json"),
+      d3.csv("EmergencyManagementPerformanceGrants.csv")
+    ]).then(([us, csvData]) => {
+      const fundingByState = {};
+      csvData.forEach(d => {
+        fundingByState[d.state] = (fundingByState[d.state] || 0) + +d.fundingAmount;
       });
 
-    // Add axes
-    svg.append("g")
-      .attr("transform", `translate(0,${height})`)
-      .call(d3.axisBottom(x))
-      .selectAll("text")
-      .attr("transform", "rotate(-45)")
-      .style("text-anchor", "end");
+      const fundingValues = Object.values(fundingByState);
+      const maxFunding = d3.max(fundingValues);
+      colorScale.domain([0, maxFunding]);
 
-    svg.append("g")
-      .call(d3.axisLeft(y));
+      const projection = d3.geoAlbersUsa()
+        .fitSize([width - margin.left - margin.right, height - margin.top - margin.bottom],
+          topojson.feature(us, us.objects.states));
 
-    // Add labels
-    svg.append("text")
-      .attr("class", "axis-label")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 0 - margin.left)
-      .attr("x", 0 - (height / 2))
-      .attr("dy", "1em")
-      .style("text-anchor", "middle")
-      .text("Number of Projects");
+      const path = d3.geoPath().projection(projection);
 
-    // Add legend
-    const legend = svg.append("g")
-      .attr("class", "legend")
-      .attr("transform", `translate(${width + 10}, 0)`);
+      svg.append("g")
+        .selectAll("path")
+        .data(topojson.feature(us, us.objects.states).features)
+        .enter()
+        .append("path")
+        .attr("class", "state")
+        .attr("d", path)
+        .attr("fill", d => {
+          const stateName = d.properties.name;
+          return fundingByState[stateName] ? colorScale(fundingByState[stateName]) : "#ccc";
+        })
+        .on("mouseover", (event, d) => {
+          const stateName = d.properties.name;
+          const funding = fundingByState[stateName] || 0;
 
-    const legendItems = legend.selectAll(".legend-item")
-      .data(keys)
-      .enter()
-      .append("g")
-      .attr("class", "legend-item")
-      .attr("transform", (d, i) => `translate(0, ${i * 20})`);
+          tooltip
+            .style("opacity", 1)
+            .html(`
+                            <strong>${stateName}</strong><br>
+                            Funding: $${funding.toLocaleString()}
+                        `)
+            .style("left", (event.pageX + 10) + "px")
+            .style("top", (event.pageY - 28) + "px");
+        })
+        .on("mousemove", (event) => {
+          tooltip
+            .style("left", (event.pageX + 10) + "px")
+            .style("top", (event.pageY - 28) + "px");
+        })
+        .on("mouseout", () => {
+          tooltip.style("opacity", 0);
+        });
 
-    legendItems.append("rect")
-      .attr("width", 18)
-      .attr("height", 18)
-      .attr("fill", d => color(d));
+      const legendWidth = 400;
+      const legendHeight = 20;
 
-    legendItems.append("text")
-      .attr("x", 24)
-      .attr("y", 9)
-      .attr("dy", ".35em")
-      .text(d => d.charAt(0).toUpperCase() + d.slice(1));
+      const defs = svg.append("defs");
+      const gradient = defs.append("linearGradient")
+        .attr("id", "legend-gradient")
+        .attr("x1", "0%")
+        .attr("x2", "100%");
+
+      gradient.selectAll("stop")
+        .data(d3.range(0, 1.1, 0.1))
+        .enter()
+        .append("stop")
+        .attr("offset", d => `${d * 100}%`)
+        .attr("stop-color", d => colorScale(d * maxFunding));
+
+      const legend = svg.append("g")
+        .attr("transform", `translate(${width - legendWidth - margin.right}, ${margin.top})`);
+
+      legend.append("rect")
+        .attr("width", legendWidth)
+        .attr("height", legendHeight)
+        .style("fill", "url(#legend-gradient)")
+        .style("stroke", "#ccc");
+
+      legend.append("text")
+        .attr("x", 0)
+        .attr("y", -5)
+        .style("font-family", "Arial, sans-serif")
+        .text(`$0`);
+
+      legend.append("text")
+        .attr("x", legendWidth)
+        .attr("y", -5)
+        .style("text-anchor", "end")
+        .style("font-family", "Arial, sans-serif")
+        .text(`$${maxFunding.toLocaleString()}`);
+
+      legend.append("text")
+        .attr("x", legendWidth / 2)
+        .attr("y", -5)
+        .style("text-anchor", "middle")
+        .style("font-family", "Arial, sans-serif")
+        .text("Funding Amount");
+    });
   </script>
 </body>
 

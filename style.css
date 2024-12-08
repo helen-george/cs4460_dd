@@ -58,8 +58,8 @@ main ul {
 footer {
   text-align: center;
   padding: 1rem;
-  background: #121212;
-  color: #999; /* Light gray text for footer */
+  background: #008fff;
+  color: #fff; /* Light gray text for footer */
   font-family: 'Fira Code', monospace; /* Minimalist look for footer */
 }
 

@@ -8,10 +8,8 @@ Promise.all([
     const participationMap = new Map();
 
     data.forEach(d => {
-        const state = d.state; // Assuming `d.state` is a two-letter state code (e.g., 'KS', 'CA')
-        const participating = +d.participatingInNFIP; // 1 = participating, 0 = not participating
-        // console.log(`State: ${d.state}, Participating: ${d.participatingInNFIP}`);
-
+        const state = d.state;
+        const participating = +d.participatingInNFIP;
 
         if (state && participating !== undefined) {
             if (!participationMap.has(state)) {
@@ -19,9 +17,9 @@ Promise.all([
             }
 
             const stateData = participationMap.get(state);
-            stateData.total += 1; // Increment total community count
+            stateData.total += 1;
             if (participating === 1) {
-                stateData.participating += 1; // Increment participating community count
+                stateData.participating += 1;
             }
         }
     });
@@ -33,7 +31,7 @@ Promise.all([
         console.log(stateData.participating)
         console.log(stateData.total)
         const participationPercentage = stateData.total > 0 ? (stateData.participating / stateData.total) * 100 : 0;
-        const nonParticipationPercentage = 100 - participationPercentage; // Calculate non-participation
+        const nonParticipationPercentage = 100 - participationPercentage;
         nonParticipationPercentageMap.set(state, nonParticipationPercentage);
     });
 
@@ -53,9 +51,8 @@ Promise.all([
 
     // Define color scale with a darker starting color for 0%
     const colorScale = d3.scaleLinear()
-        .domain([0, 25]) // Non-participation percentage range from 0% to 100%
-        .range(["#90d5ff", "#000435"]); // Custom colors: light pink to dark red
-
+        .domain([0, 25])
+        .range(["#90d5ff", "#000435"]);
 
     // Draw the states
     svg.selectAll("path")
@@ -65,9 +62,9 @@ Promise.all([
         .attr("d", path)
         .attr("fill", d => {
             const state = d.properties.NAME;
-            const stateCode = getStateCode(state); // Map state name to its code
+            const stateCode = getStateCode(state);
             const nonParticipationPercentage = nonParticipationPercentageMap.get(stateCode) || 0;
-            return colorScale(nonParticipationPercentage); // Use color scale for non-participation
+            return colorScale(nonParticipationPercentage);
         })
         .attr("stroke", "#fff")
         .attr("stroke-width", 0.5)
@@ -80,7 +77,33 @@ Promise.all([
                     Non-Participation in NFIP: ${nonParticipationPercentage.toFixed(2)}%`);
         })
         .on("mousemove", (event) => {
-            tooltip.style("top", `${event.pageY + 5}px`).style("left", `${event.pageX + 5}px`);
+            // Get the mouse coordinates relative to the viewport
+            const mouseX = event.clientX;
+            const mouseY = event.clientY;
+
+            // Get the tooltip dimensions
+            const tooltipNode = tooltip.node();
+            const tooltipWidth = tooltipNode.offsetWidth;
+            const tooltipHeight = tooltipNode.offsetHeight;
+
+            // Calculate position to prevent tooltip from going off-screen
+            let left = mouseX + 10;
+            let top = mouseY + 10;
+
+            // Adjust if tooltip would go off the right side of the screen
+            if (left + tooltipWidth > window.innerWidth) {
+                left = mouseX - tooltipWidth - 10;
+            }
+
+            // Adjust if tooltip would go off the bottom of the screen
+            if (top + tooltipHeight > window.innerHeight) {
+                top = mouseY - tooltipHeight - 10;
+            }
+
+            // Apply the calculated position
+            tooltip
+                .style("left", `${left}px`)
+                .style("top", `${top}px`);
         })
         .on("mouseout", () => {
             tooltip.style("display", "none");
@@ -89,12 +112,13 @@ Promise.all([
     // Add tooltip
     const tooltip = d3.select("body").append("div")
         .attr("class", "tooltip")
-        .style("position", "absolute")
+        .style("position", "fixed") // Changed from absolute to fixed
         .style("padding", "8px")
         .style("background", "rgba(0, 0, 0, 0.7)")
         .style("color", "#fff")
         .style("border-radius", "4px")
-        .style("display", "none");
+        .style("display", "none")
+        .style("pointer-events", "none"); // Prevent tooltip from interfering with mouse events
 
     // Add legend
     const legendWidth = 20;
@@ -103,7 +127,7 @@ Promise.all([
         .attr("transform", `translate(${width - 50}, 295)`);
 
     const legendScale = d3.scaleLinear()
-        .domain([100, 0]) // The range is from 0% to 100% non-participation
+        .domain([100, 0])
         .range([legendHeight, 0]);
 
     const legendAxis = d3.axisRight(legendScale).ticks(5);
@@ -138,9 +162,5 @@ function getStateCode(stateName) {
         "South Dakota": "SD", "Tennessee": "TN", "Texas": "TX", "Utah": "UT", "Vermont": "VT",
         "Virginia": "VA", "Washington": "WA", "West Virginia": "WV", "Wisconsin": "WI", "Wyoming": "WY"
     };
-    return stateCodes[stateName] || stateName; // Return abbreviation or name directly if missing
+    return stateCodes[stateName] || stateName;
 }
-
-
-
-
