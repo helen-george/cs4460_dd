@@ -1,0 +1,28 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 20px;
+}
+
+#chart {
+    width: 100%;
+    height: 500px;
+}
+
+svg {
+    width: 100%;
+    height: 100%;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    shape-rendering: crispEdges;
+    stroke: black;
+    stroke-width: 1px;
+}
+
+.circle {
+    fill: steelblue;
+    stroke: black;
+}

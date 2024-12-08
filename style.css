@@ -3,8 +3,8 @@ body, html {
   margin: 0;
   padding: 0;
   font-family: 'Anonymous Pro', monospace; /* Default font for body */
-  background-color: #000; /* Black background */
-  color: #fff; /* White text */
+  background-color: #fff; /* Black background */
+  color: #000; /* White text */
   line-height: 1.6;
 }
 
@@ -12,8 +12,7 @@ body, html {
 header {
   text-align: center;
   padding: 2rem;
-  background: #121212;
-  border-bottom: 2px solid #333;
+  background: #008fff;
 }
 
 header h1 {
@@ -21,7 +20,7 @@ header h1 {
   font-size: 2.5rem;
   margin: 0;
   font-weight: 700; /* Bold text */
-  color: #ffffff;
+  color: #fff;
 }
 
 /* Main Content */
@@ -37,7 +36,7 @@ main h2 {
   font-family: 'Red Hat Display', sans-serif; /* Headings in content sections */
   font-size: 2rem;
   margin-bottom: 1rem;
-  color: #ddd; /* Slightly off-white for headings */
+  color: #000; /* Slightly off-white for headings */
   font-weight: 600; /* Medium-bold */
 }
 
@@ -45,14 +44,14 @@ main p {
   font-family: 'Anonymous Pro', monospace; /* Use for regular content text */
   margin-bottom: 1rem;
   font-size: 1rem;
-  color: #eaeaea; /* Slightly lighter for better readability */
+  color: #333; /* Slightly lighter for better readability */
 }
 
 main ul {
   font-family: 'Fira Code', monospace; /* Clean look for lists */
   padding-left: 1.5rem;
   list-style: disc;
-  color: #fff;
+  color: #000;
 }
 
 /* Footer */
@@ -69,89 +68,8 @@ strong {
   font-weight: 700; /* Bold for emphasis */
 }
 
-/* libby stuff */
-axis path,
-.axis line {
-    fill: none;
-    shape-rendering: crispEdges;
-    stroke: black;
-    stroke-width: 1px;
-}
-
-.circle {
-    fill: steelblue;
-    stroke: black;
-}
-
-.d3-tip {
-  line-height: 1;
-  padding: 6px;
-  background: rgba(240, 240, 240, 0.95);
-  color: #c11d1d;
-  border-radius: 4px;
-  font-size: 12px;
-}
-
-/* Creates a small triangle extender for the tooltip */
-.d3-tip:after {
-  box-sizing: border-box;
-  display: inline;
-  font-size: 10px;
+iframe {
   width: 100%;
-  line-height: 1;
-  color: rgba(240, 240, 240, 0.95);
-  content: "\25BC";
-  position: absolute;
-  text-align: center;
-}
-
-/* Style northward tooltips specifically */
-.d3-tip.n:after {
-  margin: -2px 0 0 0;
-  top: 100%;
-  left: 0;
-}
-
-.d3-tip h5{
-  font-size: 20px;
-  font-weight: 500;
-  margin: 2px 10px 4px 2px;
-  background: rgba(255, 255, 255, 0.95);
-  color: #000000;
-  font-family: "Arial";
-}
-
-.d3-tip thead td {
-  border-bottom: 1px solid #ccc;
-  font-size: 20px;
-  font-weight: 600;
-  background: rgba(255, 255, 255, 0.95);
-  font-family: "Arial";
-}
-
-.d3-tip td {
-  padding: 2px 10px 2px 2px;
-}
-
-.d3-tip thead tr {
-  padding-top: 10px;
-}
-
-/* body {
-    font-family: "Open Sans";
-    margin: 10px;
-    font-size: 40px;
-    background: rgba(255, 255, 255, 0.95);
-    font-family: "Arial";
-    color: #000000;
-} */
-
-
-.d3-tip tbody {
-    font-family: "Open Sans";
-    margin: 10px;
-    font-size: 10px;
-    background: rgba(255, 255, 255, 0.95);
-    font-family: "Arial";
-    color: #000000;
+  height: 1000px;
+  border: none;
 }
